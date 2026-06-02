@@ -10,7 +10,6 @@ This repository stores the user-maintained Codex skills that are installed under
 
 - `answer-sql-question`
 - `english-practice-tracker`
-- `frondend-interviewer`
 - `frontend-interview-tracker`
 - `take-notes`
 
@@ -19,7 +18,7 @@ This repository stores the user-maintained Codex skills that are installed under
 After editing skills in this repository, sync them back to Codex with:
 
 ```bash
-rsync -a --delete --exclude='.git/' --exclude='.DS_Store' /Users/lqd/projects/ai-skills/ /Users/lqd/.codex/skills/
+rsync -a --delete --exclude='.git/' --exclude='.DS_Store' --exclude='.system/' --exclude='.gitignore' --exclude='README.md' /Users/lqd/projects/ai-skills/ /Users/lqd/.codex/skills/
 ```
 
 The `.system` skills are managed by Codex and are intentionally not stored here.
