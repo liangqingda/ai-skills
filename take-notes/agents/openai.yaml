@@ -1,0 +1,4 @@
+interface:
+  display_name: "Take Notes"
+  short_description: "Organize detailed study notes"
+  default_prompt: "Use $take-notes to organize detailed notes for this topic."

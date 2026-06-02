@@ -1,0 +1,4 @@
+interface:
+  display_name: "Frontend Interviewer"
+  short_description: "Practice non-repeated frontend interview questions"
+  default_prompt: "Use $frondend-interviewer to interview me on JavaScript with non-repeated same-difficulty questions."

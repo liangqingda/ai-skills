@@ -1,0 +1,4 @@
+interface:
+  display_name: "English Practice Tracker"
+  short_description: "Adaptive English practice with Notion records"
+  default_prompt: "Use $english-practice-tracker to run one level-matched English practice question, update asked-question memory, recalibrate the learner's level from historical answers after scoring, avoid repeats, and record the completed round in Notion."

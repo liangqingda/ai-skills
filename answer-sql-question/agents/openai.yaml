@@ -1,0 +1,4 @@
+interface:
+  display_name: "Answer SQL Question"
+  short_description: "Detailed SQL explanations with row-by-row examples"
+  default_prompt: "Use $answer-sql-question to explain this SQL question with concrete sample data and result-by-result reasoning."
