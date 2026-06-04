@@ -1,4 +1,10 @@
 interface:
   display_name: "Take Notes"
-  short_description: "Organize detailed study notes"
-  default_prompt: "Use $take-notes to organize detailed notes for this topic."
+  short_description: "Organize notes; Notion uses MCP only"
+  default_prompt: "Use $take-notes to organize detailed notes for this topic; for Notion links, use Notion MCP only."
+
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "notion"
+      description: "Required to read and update Notion pages or databases for linked-document note taking."

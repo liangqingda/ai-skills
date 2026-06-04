@@ -47,3 +47,17 @@ Append a new entry immediately after deciding an exercise and before sending it 
 - 题目指纹: 写作-中级-句子衔接与自然搭配-20260602-01
 - 状态: 已完成
 - Notion: 未写入（当前线程无 Notion 工具）
+
+## 2026-06-03T07:41:49+0800
+- 题目指纹: 翻译-中级-although-even-though让步从句-20260603-01
+- 类型: 翻译
+- 难度: 中级
+- 知识点: although/even though 让步从句
+- 状态: 已出题
+- 题目: 将中文自然翻译成英文：虽然我每天都学英语，但如果我只是被动地看视频，进步会很慢。要求使用 `although` 或 `even though`，并尽量写成一个自然的完整句。
+- Notion: 留空
+
+## 2026-06-03T07:46:47+0800 完成记录
+- 题目指纹: 翻译-中级-although-even-though让步从句-20260603-01
+- 状态: 已完成
+- Notion: https://app.notion.com/p/373e5354386081d980a7d8e5d53edaa4
