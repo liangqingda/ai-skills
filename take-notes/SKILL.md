@@ -40,6 +40,7 @@ Create comprehensive, teachable notes for a requested topic or document section.
    - For each new professional or technical term introduced in the notes, add a short explanation and a small demo or example.
    - Prefer tables for comparisons, state transitions, truth tables, command/result pairs, and before/after behavior.
    - Include common mistakes, edge cases, and mental models when they help understanding.
+   - For technical study topics, follow the Learning-Oriented Requirements so the notes train active practice rather than passive reading.
    - When writing into a linked document, follow the linked document structure rules below.
    - When writing into a linked document, append the consulted source links at the end of the inserted or updated notes.
 
@@ -67,6 +68,34 @@ Use this structure unless the user's requested format or the target document cle
 5. Common patterns: practical usage patterns and when each applies.
 6. Edge cases: traps, gotchas, limitations, and debugging clues.
 7. Summary: compact takeaways and review checklist.
+
+## Learning-Oriented Requirements
+
+When creating technical study notes, optimize for active learning rather than passive reading.
+
+- Split the topic into learning tiers:
+  - Must know: concepts and APIs the learner should master first.
+  - Commonly used: practical patterns used in real projects.
+  - Advanced: useful but not required for the first pass.
+  - Optional/deferred: details that can be skipped until needed.
+- Include runnable labs for important concepts:
+  - File structure or setup.
+  - Complete code.
+  - Command to run.
+  - Expected output.
+  - Explanation of why that output happens.
+- Before showing the explanation for a demo, include a short "Predict first" prompt that asks the learner to guess the result.
+- Include mistake-driven examples:
+  - Broken code or wrong assumption.
+  - Actual error message or observable failure.
+  - Root cause.
+  - Corrected version.
+- End each major topic with practice tasks:
+  - 2-5 exercises.
+  - Clear acceptance criteria.
+  - Hints before full solutions when appropriate.
+- For technical tools, APIs, runtimes, and frameworks, prefer official documentation as the primary source and mention the version or date context when behavior may vary.
+- Avoid overwhelming the learner with exhaustive API lists too early. Prefer a progressive path from core usage to edge cases.
 
 ## Term Coverage Rules
 
