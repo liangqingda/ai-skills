@@ -5,7 +5,7 @@ description: Scaffold and verify a new Express/TypeScript service repository tha
 
 # generate-express-service-repo
 
-Create a working service, not just a directory outline. Read [references/service-contract.md](references/service-contract.md) for the route adapter, schema-package compatibility, configuration, and verification details before generating files.
+Create a working service, not just a directory outline. Read [references/service-contract.md](references/service-contract.md) for the route adapter, schema-package compatibility, reference service tooling configuration, and verification details before generating files.
 
 ## Inputs and Boundaries
 
@@ -15,7 +15,7 @@ Confirm the target is absent or empty before writing. Respect any existing repos
 
 ## Repository Contract
 
-- Node >=22, pnpm, TypeScript, Express, Zod. Use current stable dependency releases resolved from their package registries during generation, pin a compatible pnpm version in `packageManager`, commit the lockfile, and verify the actual installed versions. Account for major-version compatibility (notably Express typings, Zod, Vitest, TypeScript, SWC, ESLint, and the schema package); do not guess numeric latest versions. Use public ESLint configuration unless installation of a private one is confirmed; document the difference.
+- Node >=22, pnpm, TypeScript, Express, Zod. Use current stable dependency releases resolved from their package registries during generation, pin a compatible pnpm version in `packageManager`, commit the lockfile, and verify the actual installed versions. Account for major-version compatibility (notably Express typings, Zod, Vitest, TypeScript, SWC, ESLint, and the schema package); do not guess numeric latest versions. Follow the ESLint, TypeScript, Prettier, and registry guidance in the reference. Use public tooling unless installation of the private shared packages is confirmed; document the difference.
 - Set `main` to `build/index.js`, `type` to `commonjs`, and `engines.node` to `>=22`. TypeScript uses `module` and `moduleResolution` `NodeNext`, `target` `ES2020`, `rootDir` `src`, `outDir` `build`, `tsBuildInfoFile` `build/.tsbuildinfo`, plus `strict`, `noImplicitAny`, `noUncheckedIndexedAccess`, `esModuleInterop`, `declaration`, `sourceMap`, and `inlineSources`. Set `incremental` if required for `tsBuildInfoFile`. Production build excludes `*.test.ts` and `tests/`; provide `tsconfig.test.json` covering tests. Ensure `typecheck` and `typecheck:test` really work with `--noEmit`.
 - `src/index.ts` loads environment variables before configuration and sets up any runtime aliases before importing aliased modules, then starts the HTTP server. Prefer relative imports throughout to eliminate cross-tool alias drift. If aliases are used, align TypeScript, SWC, Vitest, and Node runtime resolution and test both builds.
 - `src/services/` assembles the Express app independently of `listen()`. `src/routes/` registers routes with minimal logic; `src/middlewares/` contains validation, error handling, response, and logging middleware; `src/lib/` owns business logic; `src/consts/` owns configuration/constants; `src/utils/` is business-neutral; `src/types/` is service-specific. `tests/` holds test setup/shared helpers. Create `src/queries/` only for an enabled database and `src/thirdParty/` only for an actual integration. Do not manufacture empty directories or placeholder modules.
