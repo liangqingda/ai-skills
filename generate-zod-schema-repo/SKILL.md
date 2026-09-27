@@ -1,9 +1,9 @@
 ---
-name: generate-zod-schema
+name: generate-zod-schema-repo
 description: Scaffold a reusable Zod schema package from an empty folder, including TypeScript types, OpenAPI 3.1 generation, a runnable API example, lint, build, and registry-ready packaging. Use when a user asks to create a new schema/contract repository from scratch, not to add one schema to an existing project.
 ---
 
-# Generate Zod Schema
+# Generate Zod Schema Repo
 
 Create a complete, runnable schema package from an empty directory. This skill includes a self-contained starter under `assets/starter/` and `scripts/scaffold.mjs`; do not depend on another project being present.
 
