@@ -1,0 +1,3 @@
+interface:
+  display_name: Generate Zod Schema
+  short_description: Scaffold a Zod schema package from an empty directory
