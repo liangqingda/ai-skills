@@ -1,3 +1,3 @@
 interface:
-  display_name: Generate Express Service
+  display_name: "generate-express-service-repo"
   short_description: Scaffold an Express service using a separate Zod schema package

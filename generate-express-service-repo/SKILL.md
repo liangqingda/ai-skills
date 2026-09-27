@@ -3,7 +3,7 @@ name: generate-express-service-repo
 description: Scaffold and verify a new Express/TypeScript service repository that consumes a separate Zod schema package. Use when creating a service repo from scratch, not when adding a route to an existing service or generating the schema package itself.
 ---
 
-# Generate Express Service Repo
+# generate-express-service-repo
 
 Create a working service, not just a directory outline. Read [references/service-contract.md](references/service-contract.md) for the route adapter, schema-package compatibility, configuration, and verification details before generating files.
 
