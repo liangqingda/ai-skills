@@ -73,11 +73,6 @@ Use this structure unless the user's requested format or the target document cle
 
 When creating technical study notes, optimize for active learning rather than passive reading.
 
-- Split the topic into learning tiers:
-  - Must know: concepts and APIs the learner should master first.
-  - Commonly used: practical patterns used in real projects.
-  - Advanced: useful but not required for the first pass.
-  - Optional/deferred: details that can be skipped until needed.
 - Include runnable labs for important concepts:
   - File structure or setup.
   - Complete code.
