@@ -1,0 +1,26 @@
+# Schema and HTTP Contract
+
+## Inspect the Dependency
+
+Read the actual schema package's `package.json` exports and type declarations. In the companion `generate-zod-schema-repo` starter, `./apis` exports `ApiInfo`, `createGreetingApi`, `greetingRequestSchema`, `greetingResponseSchema`, and `GreetingResponse`. `createGreetingApi` is POST `/greetings`; its `body` and `response` come from the shared package. Do not copy request definitions, response types, or schema package business source into the service. Import from the package's public export paths; don't import internal source paths.
+
+The starter's `defineApiInfo` returns the non-generic `ApiInfo`, so its `body`, `query`, and `params` properties lose their specific static types. Do not claim `z.output<typeof createGreetingApi.body>` recovers the original request type. Instead, import the named request schemas, type the route handler inputs with `z.output<typeof greetingRequestSchema>` (and named params/query schemas where available), and use the schemas on `apiInfo` to validate actual HTTP inputs. If the companion package has a richer generic contract, use it without duplicating schemas. Import the shared response type in the example handler and honor the declared response status.
+
+Implement a reusable `apiHandler(apiInfo, handler)` that dispatches on `apiInfo.method` and registers `apiInfo.path` on an Express router. Parse only fields for which `apiInfo` has a schema, using `safeParse` or equivalent. Provide parsed `params`, `query`, and `body` to the handler; validation errors must yield a clear 400-class JSON response without leaking untrusted input or secrets. Call the handler through an async error boundary (or rely on verified Express 5 async handling) so rejections reach the common error middleware. Keep any necessary type assertion at the validation boundary; never type an unvalidated `req.body` as `z.output`. Check unknown method/path combinations and avoid double responses. The handler's response type should use the schema package's shared type; if response runtime validation is enabled, treat failures as server errors, not client errors.
+
+The example route must be anonymous, perform a small real operation in `src/lib/`, and have unit and Supertest HTTP tests for success and invalid input. Provide an explicit auth extension interface only if needed; metadata such as `requiresAuth` is not an authorization implementation. Do not add fake tokens, login endpoints, or pretend permission checks.
+
+## App Lifecycle and Security
+
+Keep `createApp()` free of `listen()` and side-effectful external connections. Test it with Supertest in Vitest's Node environment. Parse `HTTP_PORT` as an integer in range, validate `NODE_ENV` and `LOG_LEVEL`, and parse allowed CORS origins from an explicit setting. Development defaults may be convenient, but production must not fall back to unrestricted origins. Conditional integrations validate their required variables only when explicitly enabled. In `src/index.ts`, load dotenv before importing modules that read configuration; use a bootstrap import strategy when import hoisting would violate that ordering. Install logging without request bodies, authorization headers, cookies, query tokens, or credentials. Configure `pino-http` redaction for sensitive paths and keep Morgan only if it adds a concrete, non-duplicated purpose; do not produce two request logs accidentally.
+
+Translate malformed JSON and schema failures to 4xx, missing routes to 404, and unexpected errors to a sanitized 5xx with structured server-side logging. Register the error middleware after the 404 handler. When terminating, close the HTTP server and any enabled pools/clients.
+
+## Build and Verification Traps
+
+- NodeNext plus CommonJS requires the package boundary to be CommonJS and imports that work in both emitted `tsc` and SWC output. With relative imports, avoid TypeScript-only path mappings. Check actual compiled `build/index.js` and run it after each build.
+- Ensure SWC keeps the expected `src/` layout (especially `build/index.js`), targets ES2020 and CommonJS, emits source maps as configured, and excludes colocated `*.test.ts` in nested directories. SWC does not typecheck or emit TypeScript declarations; use `typecheck` and the `tsc` build separately.
+- A clean build must not erase itself while a watcher is running. For watch mode compile without repeatedly removing the output directory. Verify `dev` and `start:watch` commands on the actual installed tool versions.
+- `tsconfig.test.json` must include test files without leaking them into production build; if `rootDir: src` conflicts with `tests/`, override `rootDir` and `noEmit` appropriately in the test config. The `typecheck:test` command must execute rather than merely exist.
+- If the schema package is unpublished, use a relative `file:` reference or a local tarball, not a machine-specific absolute path. Ensure CI and Docker can access that dependency, or state that those checks/deployment are blocked until a published package and registry access exist. Never silently point CI at another local repository.
+- The Dockerfile must produce a lean production install from the same lockfile used in CI, build with dev tools, and run `node build/index.js` under a non-root user. Verify the health endpoint inside the image when Docker is available.

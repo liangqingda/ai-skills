@@ -1,0 +1,3 @@
+interface:
+  display_name: Generate Express Service
+  short_description: Scaffold an Express service using a separate Zod schema package
