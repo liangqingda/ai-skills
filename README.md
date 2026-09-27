@@ -8,7 +8,6 @@ This repository stores the user-maintained Codex skills that are installed under
 
 ## Skills
 
-- `answer-sql-question`
 - `english-practice-tracker`
 - `frontend-interview-tracker`
 - `generate-zod-schema-repo`

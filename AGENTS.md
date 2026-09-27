@@ -11,7 +11,6 @@ skills is triggered or explicitly named, use the repository-local skill entry
 and ignore any duplicate installed entry with the same name under
 `/Users/lqd/.codex/skills`:
 
-- `answer-sql-question` -> `/Users/lqd/projects/ai-skills/answer-sql-question/SKILL.md`
 - `english-practice-tracker` -> `/Users/lqd/projects/ai-skills/english-practice-tracker/SKILL.md`
 - `frontend-interview-tracker` -> `/Users/lqd/projects/ai-skills/frontend-interview-tracker/SKILL.md`
 - `take-notes` -> `/Users/lqd/projects/ai-skills/take-notes/SKILL.md`
