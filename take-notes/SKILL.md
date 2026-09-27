@@ -41,15 +41,18 @@ Create comprehensive, teachable notes for a requested topic or document section.
    - Prefer tables for comparisons, state transitions, truth tables, command/result pairs, and before/after behavior.
    - Include common mistakes, edge cases, and mental models when they help understanding.
    - For technical study topics, follow the Learning-Oriented Requirements so the notes train active practice rather than passive reading.
+   - For a topic covering several named tools, libraries, or approaches, decide whether the requested result is a selection overview or a study guide. A study guide must teach each principal item to a comparable, usable depth; do not let one full lab stand in for the other items. An overview may be shorter, but label its scope and do not imply that every item has been taught.
    - When writing into a linked document, follow the linked document structure rules below.
    - When writing into a linked document, append the consulted source links at the end of the inserted or updated notes.
 
 5. Apply the update safely.
+   - Before writing, compare the title, outline, and selection tables with the actual sections: every principal item promised by a study guide must have its own usage path. Verify code and expected results where tooling permits; otherwise label unverified examples and avoid exact error text that has not been observed.
    - For Notion links, apply the update only with Notion MCP write/update tools. Never use browser editing, browser automation, screenshots, exports, clipboard paste into Notion, local replacement documents, or a ready-to-paste chat answer as a substitute.
    - For linked documents, edit the target document instead of summarizing in chat, generating a local substitute, or providing paste-ready notes.
    - When only one section is requested, replace or append within that section only.
    - Keep the document's existing style and heading hierarchy where practical.
    - Do not delete unrelated sections, child pages, databases, or existing examples.
+   - After a multi-section update, read the target again and check the intended sections, heading order, code blocks, source links, and preservation of unrelated content.
 
 6. Report the result concisely.
    - If a document was updated, mention the document and section updated.
@@ -79,6 +82,7 @@ When creating technical study notes, optimize for active learning rather than pa
   - Command to run.
   - Expected output.
   - Explanation of why that output happens.
+- For each principal library or workflow in a multi-item study guide, cover its input boundary, minimum setup, a complete example, how to run or invoke it, observable success and failure results, and the reason for each result. A shared setup or lab may serve several items only when each item's behavior is exercised and explained explicitly. Keep incidental alternatives in a comparison table rather than expanding every mention into a full lab.
 - Before showing the explanation for a demo, include a short "Predict first" prompt that asks the learner to guess the result.
 - Include mistake-driven examples:
   - Broken code or wrong assumption.
