@@ -38,7 +38,9 @@ Create comprehensive, teachable notes for a requested topic or document section.
    - Explain concepts from first principles before advanced usage.
    - Include concrete demos, input data or code where relevant, and the resulting output.
    - For each new professional or technical term introduced in the notes, add a short explanation and a small demo or example.
-   - Prefer tables for comparisons, state transitions, truth tables, command/result pairs, and before/after behavior.
+   - Choose the clearest representation for each demo. Prefer compact tables for comparisons, concurrent execution order, state transitions, truth tables, command/result pairs, and before/after behavior; retain code blocks for commands readers must run or copy.
+   - For a multi-step or multi-session demo, show the starting data, the ordered actions and their observed results in one scannable view. Label session/actor, transaction boundaries, and the point at which a snapshot, commit, rollback, or error occurs. Do not make readers reconstruct the timeline from separate code blocks.
+   - Explain the decisive row or state change after the table. Avoid duplicating the same full demo in prose, a table, and code unless the code is needed to reproduce it.
    - Include common mistakes, edge cases, and mental models when they help understanding.
    - For technical study topics, follow the Learning-Oriented Requirements so the notes train active practice rather than passive reading.
    - For a topic covering several named tools, libraries, or approaches, decide whether the requested result is a selection overview or a study guide. A study guide must teach each principal item to a comparable, usable depth; do not let one full lab stand in for the other items. An overview may be shorter, but label its scope and do not imply that every item has been taught.
@@ -84,6 +86,7 @@ When creating technical study notes, optimize for active learning rather than pa
   - Explanation of why that output happens.
 - For each principal library or workflow in a multi-item study guide, cover its input boundary, minimum setup, a complete example, how to run or invoke it, observable success and failure results, and the reason for each result. A shared setup or lab may serve several items only when each item's behavior is exercised and explained explicitly. Keep incidental alternatives in a comparison table rather than expanding every mention into a full lab.
 - Before showing the explanation for a demo, include a short "Predict first" prompt that asks the learner to guess the result.
+- Check each demo's presentation: can a reader see the initial state, execution order, intermediate observation, and final state without mentally interleaving paragraphs? If not, add a small table or restructure it. Keep tables short and use code blocks alongside them when exact runnable syntax matters.
 - Include mistake-driven examples:
   - Broken code or wrong assumption.
   - Actual error message or observable failure.
@@ -146,5 +149,6 @@ When updating an existing document section:
 - Be much more detailed than a summary.
 - Use demos with explicit results, not examples that stop before the outcome.
 - Favor concrete artifacts over abstract prose: code plus output, table plus result rows, command plus response, or scenario plus conclusion.
+- For concurrency and transaction examples, prefer a timeline table with explicit session columns and a result column; for rollback and mutation examples, prefer a before/after state table. Use only columns that materially clarify the outcome.
 - Keep the notes organized enough to scan, even when exhaustive.
 - If the target page is long, avoid rewriting unrelated areas.
