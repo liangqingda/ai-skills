@@ -1,4 +1,0 @@
-interface:
-  display_name: "Frontend Interview Tracker"
-  short_description: "Practice adaptive frontend interviews with optional Notion tracking"
-  default_prompt: "Use $frontend-interview-tracker to interview me on JavaScript, avoid repeated questions, adapt the next question to my historical answer level, and save each completed round to Notion unless I ask not to record it."

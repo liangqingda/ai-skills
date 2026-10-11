@@ -1,6 +1,6 @@
 ---
 name: take-notes
-description: Use this skill when the user asks to organize detailed knowledge-point notes, study notes, technical notes, or a specific section of an existing document, such as "整理 xxx 知识点", "整理 xxx 笔记", "帮我补充文档里的 xxx 部分", or similar. If the user provides a Notion link, the notes must be read and written only through Notion MCP tools; never use a browser, export, local substitute, or chat-only workaround. If Notion MCP is unavailable or unauthorized, connect or authorize Notion MCP before drafting. If another document link cannot be edited, ask the user to resolve access and do not produce standalone notes. If no link is provided, answer directly in chat.
+description: Use this skill when the user asks to organize detailed knowledge-point notes, study notes, technical notes, or a specific section of an existing document, such as "整理 xxx 知识点", "整理 xxx 笔记", "帮我补充文档里的 xxx 部分", or similar. If the user provides a Notion link, the notes must be read and written only through Notion MCP tools; never use a browser, export, local substitute, or chat-only workaround. If Notion MCP is unavailable or unauthorized, connect or authorize Notion MCP before drafting. If another document link cannot be edited, ask the user to resolve access and do not produce standalone notes. If no link is provided, answer directly in chat. After the notes are written, automatically run the review-note skill on them to find and fix knowledge gaps (default on; capped at 2 review rounds and 2 fixes). Skip only when the user explicitly asks not to review.
 ---
 
 # Take Notes
@@ -56,7 +56,15 @@ Create comprehensive, teachable notes for a requested topic or document section.
    - Do not delete unrelated sections, child pages, databases, or existing examples.
    - After a multi-section update, read the target again and check the intended sections, heading order, code blocks, source links, and preservation of unrelated content.
 
-6. Report the result concisely.
+6. Auto-review and refine the finished notes (default on, capped at 2 rounds).
+   - Default behavior: after the notes are written (in chat or into the linked document), automatically run the review-note skill on them to surface knowledge gaps. Do not ask for permission first; this is the default and expected behavior.
+   - Per round: review the notes as written → fix every gap found (P0/P1/P2) by editing the notes in place (revise the relevant section or append the fix; do not restructure unrelated content).
+   - Cap: at most 2 review rounds and at most 2 corresponding fixes. Sequence: review #1 → fix #1 → review #2 → fix #2, then stop. If a review round finds no gaps, stop early; do not force another round.
+   - Respect the notes' location and mode: for Notion, both review and fix must go through Notion MCP only; for a linked document, edit that document; for chat-only notes, refine the chat output.
+   - Skip the auto-review only when the user explicitly asks to skip it (e.g., "不用评审" / "简单记一下"). Leave the notes unchanged in that case.
+   - After the final round, briefly state what the review found and what was fixed; if gaps remain because the 2-round cap was reached, say so explicitly instead of silently leaving them.
+
+7. Report the result concisely.
    - If a document was updated, mention the document and section updated.
    - If content was returned in chat, provide the complete notes.
    - If a linked document could not be updated, do not include the notes content. State the blocker, the attempted access/update path, and the next user action needed.

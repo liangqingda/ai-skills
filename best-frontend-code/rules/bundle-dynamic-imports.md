@@ -2,12 +2,12 @@
 title: Dynamic Imports for Heavy Components
 impact: CRITICAL
 impactDescription: directly affects TTI and LCP
-tags: bundle, dynamic-import, code-splitting, next-dynamic
+tags: bundle, dynamic-import, code-splitting, react-lazy, vite
 ---
 
 ## Dynamic Imports for Heavy Components
 
-Use `next/dynamic` to lazy-load large components not needed on initial render.
+Use `React.lazy()` + `<Suspense>` (or a plain dynamic `import()`) to lazy-load large components not needed on initial render. In Vite/Rollup this creates separate chunks loaded on demand.
 
 **Incorrect (Monaco bundles with main chunk ~300KB):**
 
@@ -22,14 +22,19 @@ function CodePanel({ code }: { code: string }) {
 **Correct (Monaco loads on demand):**
 
 ```tsx
-import dynamic from 'next/dynamic'
+import { Suspense, lazy } from 'react'
 
-const MonacoEditor = dynamic(
-  () => import('./monaco-editor').then(m => m.MonacoEditor),
-  { ssr: false }
+const MonacoEditor = lazy(() =>
+  import('./monaco-editor').then(m => m.MonacoEditor)
 )
 
 function CodePanel({ code }: { code: string }) {
-  return <MonacoEditor value={code} />
+  return (
+    <Suspense fallback={<div>Loading editor…</div>}>
+      <MonacoEditor value={code} />
+    </Suspense>
+  )
 }
 ```
+
+In a client-rendered app `lazy()` never needs an `ssr: false` option — everything is client-side. For route-level splitting, wrap each route component in `lazy()` (or use a router's built-in lazy support).

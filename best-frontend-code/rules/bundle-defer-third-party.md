@@ -1,49 +1,48 @@
 ---
 title: Defer Non-Critical Third-Party Libraries
 impact: MEDIUM
-impactDescription: loads after hydration
+impactDescription: loads after initial render
 tags: bundle, third-party, analytics, defer
 ---
 
 ## Defer Non-Critical Third-Party Libraries
 
-Analytics, logging, and error tracking don't block user interaction. Load them after hydration.
+Analytics, logging, and error tracking don't block user interaction. Load them after the initial render so they don't compete with the critical path.
 
 **Incorrect (blocks initial bundle):**
 
 ```tsx
 import { Analytics } from '@vercel/analytics/react'
 
-export default function RootLayout({ children }) {
+export default function App() {
   return (
-    <html>
-      <body>
-        {children}
-        <Analytics />
-      </body>
-    </html>
+    <>
+      <MainContent />
+      <Analytics />
+    </>
   )
 }
 ```
 
-**Correct (loads after hydration):**
+**Correct (loads after initial render):**
 
 ```tsx
-import dynamic from 'next/dynamic'
+import { Suspense, lazy } from 'react'
 
-const Analytics = dynamic(
-  () => import('@vercel/analytics/react').then(m => m.Analytics),
-  { ssr: false }
+const Analytics = lazy(() =>
+  import('@vercel/analytics/react').then(m => m.Analytics)
 )
 
-export default function RootLayout({ children }) {
+export default function App() {
   return (
-    <html>
-      <body>
-        {children}
+    <>
+      <MainContent />
+      <Suspense fallback={null}>
         <Analytics />
-      </body>
-    </html>
+      </Suspense>
+    </>
   )
 }
 ```
+
+Alternatively, load it imperatively after mount or on `requestIdleCallback` if you don't need it in the tree at all.

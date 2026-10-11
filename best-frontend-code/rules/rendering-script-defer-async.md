@@ -18,51 +18,21 @@ Use `defer` for scripts that depend on DOM or other scripts. Use `async` for ind
 
 **Incorrect (blocks rendering):**
 
-```tsx
-export default function Document() {
-  return (
-    <html>
-      <head>
-        <script src="https://example.com/analytics.js" />
-        <script src="/scripts/utils.js" />
-      </head>
-      <body>{/* content */}</body>
-    </html>
-  )
-}
+```html
+<!-- index.html -->
+<script src="https://example.com/analytics.js"></script>
+<script src="/scripts/utils.js"></script>
 ```
 
 **Correct (non-blocking):**
 
-```tsx
-export default function Document() {
-  return (
-    <html>
-      <head>
-        {/* Independent script - use async */}
-        <script src="https://example.com/analytics.js" async />
-        {/* DOM-dependent script - use defer */}
-        <script src="/scripts/utils.js" defer />
-      </head>
-      <body>{/* content */}</body>
-    </html>
-  )
-}
+```html
+<!-- Independent script - use async -->
+<script src="https://example.com/analytics.js" async></script>
+<!-- DOM-dependent script - use defer -->
+<script src="/scripts/utils.js" defer></script>
 ```
 
-**Note:** In Next.js, prefer the `next/script` component with `strategy` prop instead of raw script tags:
-
-```tsx
-import Script from 'next/script'
-
-export default function Page() {
-  return (
-    <>
-      <Script src="https://example.com/analytics.js" strategy="afterInteractive" />
-      <Script src="/scripts/utils.js" strategy="beforeInteractive" />
-    </>
-  )
-}
-```
+**Note:** In a Vite app, third-party scripts that belong in the HTML shell live in `index.html`; defer/async there is the direct fix. Scripts added dynamically from React code can use plain `document.createElement('script')` or a loader like `@vercel/analytics`. Build-time modules don't need this — bundlers already emit optimized `<script type="module">` tags.
 
 Reference: [MDN - Script element](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script#defer)

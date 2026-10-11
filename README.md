@@ -9,7 +9,6 @@ This repository stores the user-maintained Codex skills that are installed under
 ## Skills
 
 - `english-practice-tracker`
-- `frontend-interview-tracker`
 - `generate-zod-schema-repo`
 - `take-notes`
 

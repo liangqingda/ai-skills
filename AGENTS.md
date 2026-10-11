@@ -12,7 +12,6 @@ and ignore any duplicate installed entry with the same name under
 `/Users/lqd/.codex/skills`:
 
 - `english-practice-tracker` -> `/Users/lqd/projects/ai-skills/english-practice-tracker/SKILL.md`
-- `frontend-interview-tracker` -> `/Users/lqd/projects/ai-skills/frontend-interview-tracker/SKILL.md`
 - `take-notes` -> `/Users/lqd/projects/ai-skills/take-notes/SKILL.md`
 
 For these skills, also resolve relative files such as `memory/`, `references/`,
