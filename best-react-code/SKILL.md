@@ -1,5 +1,5 @@
 ---
-name: best-frontend-code
+name: best-react-code
 description: Client-side React performance optimization guidelines (adapted from Vercel Engineering, trimmed to client-only React/SPA — Vite/CRA/plain React). This skill should be used when writing, reviewing, or refactoring client-side React code to ensure optimal performance patterns. Triggers on tasks involving React components, client-side data fetching, bundle optimization, or performance improvements in client-rendered apps.
 license: MIT
 metadata:
