@@ -117,65 +117,6 @@ export const closeDatabase = async () => {
 };
 ```
 
-### MongoDB with Mongoose
-
-```typescript
-// config/mongoose.ts
-import mongoose from "mongoose";
-
-const connectDB = async () => {
-  try {
-    await mongoose.connect(process.env.MONGODB_URI!, {
-      maxPoolSize: 10,
-      serverSelectionTimeoutMS: 5000,
-      socketTimeoutMS: 45000,
-    });
-
-    console.log("MongoDB connected");
-  } catch (error) {
-    console.error("MongoDB connection error:", error);
-    process.exit(1);
-  }
-};
-
-mongoose.connection.on("disconnected", () => {
-  console.log("MongoDB disconnected");
-});
-
-mongoose.connection.on("error", (err) => {
-  console.error("MongoDB error:", err);
-});
-
-export { connectDB };
-
-// Model example
-import { Schema, model, Document } from "mongoose";
-
-interface IUser extends Document {
-  name: string;
-  email: string;
-  password: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-const userSchema = new Schema<IUser>(
-  {
-    name: { type: String, required: true },
-    email: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
-  },
-  {
-    timestamps: true,
-  },
-);
-
-// Indexes
-userSchema.index({ email: 1 });
-
-export const User = model<IUser>("User", userSchema);
-```
-
 ### Transaction Pattern
 
 ```typescript

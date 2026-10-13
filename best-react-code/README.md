@@ -39,13 +39,11 @@ A structured repository for creating and maintaining React Best Practices optimi
 
 1. Copy `rules/_template.md` to `rules/area-description.md`
 2. Choose the appropriate area prefix:
-   - `async-` for Eliminating Waterfalls (Section 1)
-   - `bundle-` for Bundle Size Optimization (Section 2)
-   - `client-` for Client-Side Data Fetching (Section 3)
-   - `rerender-` for Re-render Optimization (Section 4)
-   - `rendering-` for Rendering Performance (Section 5)
-   - `js-` for JavaScript Performance (Section 6)
-   - `advanced-` for Advanced Patterns (Section 7)
+   - `bundle-` for Bundle Size Optimization (Section 1)
+   - `rerender-` for Re-render Optimization (Section 2)
+   - `rendering-` for Rendering Performance (Section 3)
+   - `js-` for JavaScript Performance (Section 4)
+   - `advanced-` for Advanced Patterns (Section 5)
 3. Fill in the frontmatter and content
 4. Ensure you have clear examples with explanations
 5. Run `pnpm build` to regenerate AGENTS.md and test-cases.json
@@ -85,7 +83,7 @@ Reference: [Link](https://example.com)
 ## File Naming Convention
 
 - Files starting with `_` are special (excluded from build)
-- Rule files: `area-description.md` (e.g., `async-parallel.md`)
+- Rule files: `area-description.md` (e.g., `bundle-barrel-imports.md`)
 - Section is automatically inferred from filename prefix
 - Rules are sorted alphabetically by title within each section
 - IDs (e.g., 1.1, 1.2) are auto-generated during build

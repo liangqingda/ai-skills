@@ -14,273 +14,72 @@ January 2026
 
 ## Abstract
 
-Comprehensive performance optimization guide for client-side React applications, designed for AI agents and LLMs. Contains 56 rules across 7 categories, prioritized by impact from critical (eliminating waterfalls, reducing bundle size) to incremental (advanced patterns). Server-side / SSR-specific rules (RSC, Next.js API Routes, hydration) are excluded. Each rule includes detailed explanations, real-world examples comparing incorrect vs. correct implementations, and specific impact metrics to guide automated refactoring and code generation.
+Comprehensive performance optimization guide for client-side React applications, designed for AI agents and LLMs. Contains 45 rules across 5 categories, prioritized by impact from critical (reducing bundle size) to incremental (advanced patterns). Server-side / SSR-specific rules (RSC, Next.js API Routes, hydration) are excluded. Each rule includes detailed explanations, real-world examples comparing incorrect vs. correct implementations, and specific impact metrics to guide automated refactoring and code generation.
 
 ---
 
 ## Table of Contents
 
-1. [Eliminating Waterfalls](#1-eliminating-waterfalls) — **CRITICAL**
-   - 1.1 [Check Cheap Conditions Before Async Flags](#11-check-cheap-conditions-before-async-flags)
-   - 1.2 [Defer Await Until Needed](#12-defer-await-until-needed)
-   - 1.3 [Dependency-Based Parallelization](#13-dependency-based-parallelization)
-   - 1.4 [Promise.all() for Independent Operations](#14-promiseall-for-independent-operations)
-2. [Bundle Size Optimization](#2-bundle-size-optimization) — **CRITICAL**
-   - 2.1 [Avoid Barrel File Imports](#21-avoid-barrel-file-imports)
-   - 2.2 [Conditional Module Loading](#22-conditional-module-loading)
-   - 2.3 [Defer Non-Critical Third-Party Libraries](#23-defer-non-critical-third-party-libraries)
-   - 2.4 [Dynamic Imports for Heavy Components](#24-dynamic-imports-for-heavy-components)
-   - 2.5 [Prefer Statically Analyzable Paths](#25-prefer-statically-analyzable-paths)
-   - 2.6 [Preload Based on User Intent](#26-preload-based-on-user-intent)
-3. [Client-Side Data Fetching](#3-client-side-data-fetching) — **MEDIUM-HIGH**
-   - 3.1 [Deduplicate Global Event Listeners](#31-deduplicate-global-event-listeners)
-   - 3.2 [Use Passive Event Listeners for Scrolling Performance](#32-use-passive-event-listeners-for-scrolling-performance)
-   - 3.3 [Use SWR for Automatic Deduplication](#33-use-swr-for-automatic-deduplication)
-   - 3.4 [Version and Minimize localStorage Data](#34-version-and-minimize-localstorage-data)
-4. [Re-render Optimization](#4-re-render-optimization) — **MEDIUM**
-   - 4.1 [Calculate Derived State During Rendering](#41-calculate-derived-state-during-rendering)
-   - 4.2 [Defer State Reads to Usage Point](#42-defer-state-reads-to-usage-point)
-   - 4.3 [Do not wrap a simple expression with a primitive result type in useMemo](#43-do-not-wrap-a-simple-expression-with-a-primitive-result-type-in-usememo)
-   - 4.4 [Don't Define Components Inside Components](#44-dont-define-components-inside-components)
-   - 4.5 [Extract Default Non-primitive Parameter Value from Memoized Component to Constant](#45-extract-default-non-primitive-parameter-value-from-memoized-component-to-constant)
-   - 4.6 [Extract to Memoized Components](#46-extract-to-memoized-components)
-   - 4.7 [Narrow Effect Dependencies](#47-narrow-effect-dependencies)
-   - 4.8 [Put Interaction Logic in Event Handlers](#48-put-interaction-logic-in-event-handlers)
-   - 4.9 [Split Combined Hook Computations](#49-split-combined-hook-computations)
-   - 4.10 [Subscribe to Derived State](#410-subscribe-to-derived-state)
-   - 4.11 [Use Functional setState Updates](#411-use-functional-setstate-updates)
-   - 4.12 [Use Lazy State Initialization](#412-use-lazy-state-initialization)
-   - 4.13 [Use Transitions for Non-Urgent Updates](#413-use-transitions-for-non-urgent-updates)
-   - 4.14 [Use useDeferredValue for Expensive Derived Renders](#414-use-usedeferredvalue-for-expensive-derived-renders)
-   - 4.15 [Use useRef for Transient Values](#415-use-useref-for-transient-values)
-5. [Rendering Performance](#5-rendering-performance) — **MEDIUM**
-   - 5.1 [Animate SVG Wrapper Instead of SVG Element](#51-animate-svg-wrapper-instead-of-svg-element)
-   - 5.2 [CSS content-visibility for Long Lists](#52-css-content-visibility-for-long-lists)
-   - 5.3 [Hoist Static JSX Elements](#53-hoist-static-jsx-elements)
-   - 5.4 [Optimize SVG Precision](#54-optimize-svg-precision)
-   - 5.5 [Use Activity Component for Show/Hide](#55-use-activity-component-for-showhide)
-   - 5.6 [Use defer or async on Script Tags](#56-use-defer-or-async-on-script-tags)
-   - 5.7 [Use Explicit Conditional Rendering](#57-use-explicit-conditional-rendering)
-   - 5.8 [Use React DOM Resource Hints](#58-use-react-dom-resource-hints)
-   - 5.9 [Use useTransition Over Manual Loading States](#59-use-usetransition-over-manual-loading-states)
-6. [JavaScript Performance](#6-javascript-performance) — **LOW-MEDIUM**
-   - 6.1 [Avoid Layout Thrashing](#61-avoid-layout-thrashing)
-   - 6.2 [Build Index Maps for Repeated Lookups](#62-build-index-maps-for-repeated-lookups)
-   - 6.3 [Cache Property Access in Loops](#63-cache-property-access-in-loops)
-   - 6.4 [Cache Repeated Function Calls](#64-cache-repeated-function-calls)
-   - 6.5 [Cache Storage API Calls](#65-cache-storage-api-calls)
-   - 6.6 [Combine Multiple Array Iterations](#66-combine-multiple-array-iterations)
-   - 6.7 [Defer Non-Critical Work with requestIdleCallback](#67-defer-non-critical-work-with-requestidlecallback)
-   - 6.8 [Early Length Check for Array Comparisons](#68-early-length-check-for-array-comparisons)
-   - 6.9 [Early Return from Functions](#69-early-return-from-functions)
-   - 6.10 [Hoist RegExp Creation](#610-hoist-regexp-creation)
-   - 6.11 [Use flatMap to Map and Filter in One Pass](#611-use-flatmap-to-map-and-filter-in-one-pass)
-   - 6.12 [Use Loop for Min/Max Instead of Sort](#612-use-loop-for-minmax-instead-of-sort)
-   - 6.13 [Use Set/Map for O(1) Lookups](#613-use-setmap-for-o1-lookups)
-   - 6.14 [Use toSorted() Instead of sort() for Immutability](#614-use-tosorted-instead-of-sort-for-immutability)
-7. [Advanced Patterns](#7-advanced-patterns) — **LOW**
-   - 7.1 [Do Not Put Effect Events in Dependency Arrays](#71-do-not-put-effect-events-in-dependency-arrays)
-   - 7.2 [Initialize App Once, Not Per Mount](#72-initialize-app-once-not-per-mount)
-   - 7.3 [Store Event Handlers in Refs](#73-store-event-handlers-in-refs)
-   - 7.4 [useEffectEvent for Stable Callback Refs](#74-useeffectevent-for-stable-callback-refs)
+1. [Bundle Size Optimization](#1-bundle-size-optimization) — **CRITICAL**
+   - 1.1 [Avoid Barrel File Imports](#11-avoid-barrel-file-imports)
+   - 1.2 [Conditional Module Loading](#12-conditional-module-loading)
+   - 1.3 [Dynamic Imports for Heavy Components](#13-dynamic-imports-for-heavy-components)
+   - 1.4 [Prefer Statically Analyzable Paths](#14-prefer-statically-analyzable-paths)
+   - 1.5 [Preload Based on User Intent](#15-preload-based-on-user-intent)
+2. [Re-render Optimization](#2-re-render-optimization) — **MEDIUM**
+   - 2.1 [Calculate Derived State During Rendering](#21-calculate-derived-state-during-rendering)
+   - 2.2 [Defer State Reads to Usage Point](#22-defer-state-reads-to-usage-point)
+   - 2.3 [Do not wrap a simple expression with a primitive result type in useMemo](#23-do-not-wrap-a-simple-expression-with-a-primitive-result-type-in-usememo)
+   - 2.4 [Don't Define Components Inside Components](#24-dont-define-components-inside-components)
+   - 2.5 [Extract Default Non-primitive Parameter Value from Memoized Component to Constant](#25-extract-default-non-primitive-parameter-value-from-memoized-component-to-constant)
+   - 2.6 [Extract to Memoized Components](#26-extract-to-memoized-components)
+   - 2.7 [Narrow Effect Dependencies](#27-narrow-effect-dependencies)
+   - 2.8 [Put Interaction Logic in Event Handlers](#28-put-interaction-logic-in-event-handlers)
+   - 2.9 [Split Combined Hook Computations](#29-split-combined-hook-computations)
+   - 2.10 [Subscribe to Derived State](#210-subscribe-to-derived-state)
+   - 2.11 [Use Functional setState Updates](#211-use-functional-setstate-updates)
+   - 2.12 [Use Lazy State Initialization](#212-use-lazy-state-initialization)
+   - 2.13 [Use Transitions for Non-Urgent Updates](#213-use-transitions-for-non-urgent-updates)
+   - 2.14 [Use useDeferredValue for Expensive Derived Renders](#214-use-usedeferredvalue-for-expensive-derived-renders)
+   - 2.15 [Use useRef for Transient Values](#215-use-useref-for-transient-values)
+3. [Rendering Performance](#3-rendering-performance) — **MEDIUM**
+   - 3.1 [Animate SVG Wrapper Instead of SVG Element](#31-animate-svg-wrapper-instead-of-svg-element)
+   - 3.2 [CSS content-visibility for Long Lists](#32-css-content-visibility-for-long-lists)
+   - 3.3 [Hoist Static JSX Elements](#33-hoist-static-jsx-elements)
+   - 3.4 [Optimize SVG Precision](#34-optimize-svg-precision)
+   - 3.5 [Use Activity Component for Show/Hide](#35-use-activity-component-for-showhide)
+   - 3.6 [Use Explicit Conditional Rendering](#36-use-explicit-conditional-rendering)
+   - 3.7 [Use useTransition Over Manual Loading States](#37-use-usetransition-over-manual-loading-states)
+4. [JavaScript Performance](#4-javascript-performance) — **LOW-MEDIUM**
+   - 4.1 [Avoid Layout Thrashing](#41-avoid-layout-thrashing)
+   - 4.2 [Build Index Maps for Repeated Lookups](#42-build-index-maps-for-repeated-lookups)
+   - 4.3 [Cache Property Access in Loops](#43-cache-property-access-in-loops)
+   - 4.4 [Cache Repeated Function Calls](#44-cache-repeated-function-calls)
+   - 4.5 [Cache Storage API Calls](#45-cache-storage-api-calls)
+   - 4.6 [Combine Multiple Array Iterations](#46-combine-multiple-array-iterations)
+   - 4.7 [Defer Non-Critical Work with requestIdleCallback](#47-defer-non-critical-work-with-requestidlecallback)
+   - 4.8 [Early Length Check for Array Comparisons](#48-early-length-check-for-array-comparisons)
+   - 4.9 [Early Return from Functions](#49-early-return-from-functions)
+   - 4.10 [Hoist RegExp Creation](#410-hoist-regexp-creation)
+   - 4.11 [Use flatMap to Map and Filter in One Pass](#411-use-flatmap-to-map-and-filter-in-one-pass)
+   - 4.12 [Use Loop for Min/Max Instead of Sort](#412-use-loop-for-minmax-instead-of-sort)
+   - 4.13 [Use Set/Map for O(1) Lookups](#413-use-setmap-for-o1-lookups)
+   - 4.14 [Use toSorted() Instead of sort() for Immutability](#414-use-tosorted-instead-of-sort-for-immutability)
+5. [Advanced Patterns](#5-advanced-patterns) — **LOW**
+   - 5.1 [Do Not Put Effect Events in Dependency Arrays](#51-do-not-put-effect-events-in-dependency-arrays)
+   - 5.2 [Initialize App Once, Not Per Mount](#52-initialize-app-once-not-per-mount)
+   - 5.3 [Store Event Handlers in Refs](#53-store-event-handlers-in-refs)
+   - 5.4 [useEffectEvent for Stable Callback Refs](#54-useeffectevent-for-stable-callback-refs)
 
 ---
 
-## 1. Eliminating Waterfalls
-
-**Impact: CRITICAL**
-
-Waterfalls are the #1 performance killer. Each sequential await adds full network latency. Eliminating them yields the largest gains.
-
-### 1.1 Check Cheap Conditions Before Async Flags
-
-**Impact: HIGH (avoids unnecessary async work when a synchronous guard already fails)**
-
-When a branch uses `await` for a flag or remote value and also requires a **cheap synchronous** condition (local props, request metadata, already-loaded state), evaluate the cheap condition **first**. Otherwise you pay for the async call even when the compound condition can never be true.
-
-This is a specialization of [Defer Await Until Needed](./async-defer-await.md) for `flag && cheapCondition` style checks.
-
-**Incorrect:**
-
-```typescript
-const someFlag = await getFlag()
-
-if (someFlag && someCondition) {
-  // ...
-}
-```
-
-**Correct:**
-
-```typescript
-if (someCondition) {
-  const someFlag = await getFlag()
-  if (someFlag) {
-    // ...
-  }
-}
-```
-
-This matters when `getFlag` hits the network, a feature-flag service, or `React.cache` / DB work: skipping it when `someCondition` is false removes that cost on the cold path.
-
-Keep the original order if `someCondition` is expensive, depends on the flag, or you must run side effects in a fixed order.
-
-### 1.2 Defer Await Until Needed
-
-**Impact: HIGH (avoids blocking unused code paths)**
-
-Move `await` operations into the branches where they're actually used to avoid blocking code paths that don't need them.
-
-**Incorrect: blocks both branches**
-
-```typescript
-async function handleRequest(userId: string, skipProcessing: boolean) {
-  const userData = await fetchUserData(userId)
-  
-  if (skipProcessing) {
-    // Returns immediately but still waited for userData
-    return { skipped: true }
-  }
-  
-  // Only this branch uses userData
-  return processUserData(userData)
-}
-```
-
-**Correct: only blocks when needed**
-
-```typescript
-async function handleRequest(userId: string, skipProcessing: boolean) {
-  if (skipProcessing) {
-    // Returns immediately without waiting
-    return { skipped: true }
-  }
-  
-  // Fetch only when needed
-  const userData = await fetchUserData(userId)
-  return processUserData(userData)
-}
-```
-
-**Another example: early return optimization**
-
-```typescript
-// Incorrect: always fetches permissions
-async function updateResource(resourceId: string, userId: string) {
-  const permissions = await fetchPermissions(userId)
-  const resource = await getResource(resourceId)
-  
-  if (!resource) {
-    return { error: 'Not found' }
-  }
-  
-  if (!permissions.canEdit) {
-    return { error: 'Forbidden' }
-  }
-  
-  return await updateResourceData(resource, permissions)
-}
-
-// Correct: fetches only when needed
-async function updateResource(resourceId: string, userId: string) {
-  const resource = await getResource(resourceId)
-  
-  if (!resource) {
-    return { error: 'Not found' }
-  }
-  
-  const permissions = await fetchPermissions(userId)
-  
-  if (!permissions.canEdit) {
-    return { error: 'Forbidden' }
-  }
-  
-  return await updateResourceData(resource, permissions)
-}
-```
-
-This optimization is especially valuable when the skipped branch is frequently taken, or when the deferred operation is expensive.
-
-For `await getFlag()` combined with a cheap synchronous guard (`flag && someCondition`), see [Check Cheap Conditions Before Async Flags](./async-cheap-condition-before-await.md).
-
-### 1.3 Dependency-Based Parallelization
-
-**Impact: CRITICAL (2-10× improvement)**
-
-For operations with partial dependencies, use `better-all` to maximize parallelism. It automatically starts each task at the earliest possible moment.
-
-**Incorrect: profile waits for config unnecessarily**
-
-```typescript
-const [user, config] = await Promise.all([
-  fetchUser(),
-  fetchConfig()
-])
-const profile = await fetchProfile(user.id)
-```
-
-**Correct: config and profile run in parallel**
-
-```typescript
-import { all } from 'better-all'
-
-const { user, config, profile } = await all({
-  async user() { return fetchUser() },
-  async config() { return fetchConfig() },
-  async profile() {
-    return fetchProfile((await this.$.user).id)
-  }
-})
-```
-
-**Alternative without extra dependencies:**
-
-```typescript
-const userPromise = fetchUser()
-const profilePromise = userPromise.then(user => fetchProfile(user.id))
-
-const [user, config, profile] = await Promise.all([
-  userPromise,
-  fetchConfig(),
-  profilePromise
-])
-```
-
-We can also create all the promises first, and do `Promise.all()` at the end.
-
-Reference: [https://github.com/shuding/better-all](https://github.com/shuding/better-all)
-
-### 1.4 Promise.all() for Independent Operations
-
-**Impact: CRITICAL (2-10× improvement)**
-
-When async operations have no interdependencies, execute them concurrently using `Promise.all()`.
-
-**Incorrect: sequential execution, 3 round trips**
-
-```typescript
-const user = await fetchUser()
-const posts = await fetchPosts()
-const comments = await fetchComments()
-```
-
-**Correct: parallel execution, 1 round trip**
-
-```typescript
-const [user, posts, comments] = await Promise.all([
-  fetchUser(),
-  fetchPosts(),
-  fetchComments()
-])
-```
-
-## 2. Bundle Size Optimization
+## 1. Bundle Size Optimization
 
 **Impact: CRITICAL**
 
 Reducing initial bundle size improves Time to Interactive and Largest Contentful Paint.
 
-### 2.1 Avoid Barrel File Imports
+### 1.1 Avoid Barrel File Imports
 
 **Impact: CRITICAL (200-800ms import cost, slow builds)**
 
@@ -319,7 +118,7 @@ Libraries commonly affected: `lucide-react`, `@mui/material`, `@mui/icons-materi
 
 Reference: [https://vercel.com/blog/how-we-optimized-package-imports-in-next-js](https://vercel.com/blog/how-we-optimized-package-imports-in-next-js)
 
-### 2.2 Conditional Module Loading
+### 1.2 Conditional Module Loading
 
 **Impact: HIGH (loads large data only when needed)**
 
@@ -346,51 +145,7 @@ function AnimationPlayer({ enabled, setEnabled }: { enabled: boolean; setEnabled
 
 The `typeof window !== 'undefined'` check prevents bundling this module for SSR, optimizing server bundle size and build speed.
 
-### 2.3 Defer Non-Critical Third-Party Libraries
-
-**Impact: MEDIUM (loads after initial render)**
-
-Analytics, logging, and error tracking don't block user interaction. Load them after the initial render so they don't compete with the critical path.
-
-**Incorrect: blocks initial bundle**
-
-```tsx
-import { Analytics } from '@vercel/analytics/react'
-
-export default function App() {
-  return (
-    <>
-      <MainContent />
-      <Analytics />
-    </>
-  )
-}
-```
-
-**Correct: loads after initial render**
-
-```tsx
-import { Suspense, lazy } from 'react'
-
-const Analytics = lazy(() =>
-  import('@vercel/analytics/react').then(m => m.Analytics)
-)
-
-export default function App() {
-  return (
-    <>
-      <MainContent />
-      <Suspense fallback={null}>
-        <Analytics />
-      </Suspense>
-    </>
-  )
-}
-```
-
-Alternatively, load it imperatively after mount or on `requestIdleCallback` if you don't need it in the tree at all.
-
-### 2.4 Dynamic Imports for Heavy Components
+### 1.3 Dynamic Imports for Heavy Components
 
 **Impact: CRITICAL (directly affects TTI and LCP)**
 
@@ -426,7 +181,7 @@ function CodePanel({ code }: { code: string }) {
 
 In a client-rendered app `lazy()` never needs an `ssr: false` option — everything is client-side. For route-level splitting, wrap each route component in `lazy()` (or use a router's built-in lazy support).
 
-### 2.5 Prefer Statically Analyzable Paths
+### 1.4 Prefer Statically Analyzable Paths
 
 **Impact: HIGH (avoids accidental broad bundles and file traces)**
 
@@ -485,7 +240,7 @@ In Next.js server code, this matters for output file tracing too. `path.join(pro
 
 Reference: [https://nextjs.org/docs/app/api-reference/config/next-config-js/output](https://nextjs.org/docs/app/api-reference/config/next-config-js/output), [https://nextjs.org/learn/seo/dynamic-imports](https://nextjs.org/learn/seo/dynamic-imports), [https://vite.dev/guide/features.html](https://vite.dev/guide/features.html), [https://esbuild.github.io/api/](https://esbuild.github.io/api/), [https://www.npmjs.com/package/@rollup/plugin-dynamic-import-vars](https://www.npmjs.com/package/@rollup/plugin-dynamic-import-vars), [https://webpack.js.org/guides/dependency-management/](https://webpack.js.org/guides/dependency-management/)
 
-### 2.6 Preload Based on User Intent
+### 1.5 Preload Based on User Intent
 
 **Impact: MEDIUM (reduces perceived latency)**
 
@@ -533,254 +288,13 @@ The `typeof window !== 'undefined'` check prevents bundling preloaded modules fo
 
 ---
 
-## 3. Client-Side Data Fetching
-
-**Impact: MEDIUM-HIGH**
-
-Automatic deduplication and efficient data fetching patterns reduce redundant network requests.
-
-### 3.1 Deduplicate Global Event Listeners
-
-**Impact: LOW (single listener for N components)**
-
-Use `useSWRSubscription()` to share global event listeners across component instances.
-
-**Incorrect: N instances = N listeners**
-
-```tsx
-function useKeyboardShortcut(key: string, callback: () => void) {
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if (e.metaKey && e.key === key) {
-        callback()
-      }
-    }
-    window.addEventListener('keydown', handler)
-    return () => window.removeEventListener('keydown', handler)
-  }, [key, callback])
-}
-```
-
-When using the `useKeyboardShortcut` hook multiple times, each instance will register a new listener.
-
-**Correct: N instances = 1 listener**
-
-```tsx
-import useSWRSubscription from 'swr/subscription'
-
-// Module-level Map to track callbacks per key
-const keyCallbacks = new Map<string, Set<() => void>>()
-
-function useKeyboardShortcut(key: string, callback: () => void) {
-  // Register this callback in the Map
-  useEffect(() => {
-    if (!keyCallbacks.has(key)) {
-      keyCallbacks.set(key, new Set())
-    }
-    keyCallbacks.get(key)!.add(callback)
-
-    return () => {
-      const set = keyCallbacks.get(key)
-      if (set) {
-        set.delete(callback)
-        if (set.size === 0) {
-          keyCallbacks.delete(key)
-        }
-      }
-    }
-  }, [key, callback])
-
-  useSWRSubscription('global-keydown', () => {
-    const handler = (e: KeyboardEvent) => {
-      if (e.metaKey && keyCallbacks.has(e.key)) {
-        keyCallbacks.get(e.key)!.forEach(cb => cb())
-      }
-    }
-    window.addEventListener('keydown', handler)
-    return () => window.removeEventListener('keydown', handler)
-  })
-}
-
-function Profile() {
-  // Multiple shortcuts will share the same listener
-  useKeyboardShortcut('p', () => { /* ... */ }) 
-  useKeyboardShortcut('k', () => { /* ... */ })
-  // ...
-}
-```
-
-### 3.2 Use Passive Event Listeners for Scrolling Performance
-
-**Impact: MEDIUM (eliminates scroll delay caused by event listeners)**
-
-Add `{ passive: true }` to touch and wheel event listeners to enable immediate scrolling. Browsers normally wait for listeners to finish to check if `preventDefault()` is called, causing scroll delay.
-
-**Incorrect:**
-
-```typescript
-useEffect(() => {
-  const handleTouch = (e: TouchEvent) => console.log(e.touches[0].clientX)
-  const handleWheel = (e: WheelEvent) => console.log(e.deltaY)
-  
-  document.addEventListener('touchstart', handleTouch)
-  document.addEventListener('wheel', handleWheel)
-  
-  return () => {
-    document.removeEventListener('touchstart', handleTouch)
-    document.removeEventListener('wheel', handleWheel)
-  }
-}, [])
-```
-
-**Correct:**
-
-```typescript
-useEffect(() => {
-  const handleTouch = (e: TouchEvent) => console.log(e.touches[0].clientX)
-  const handleWheel = (e: WheelEvent) => console.log(e.deltaY)
-  
-  document.addEventListener('touchstart', handleTouch, { passive: true })
-  document.addEventListener('wheel', handleWheel, { passive: true })
-  
-  return () => {
-    document.removeEventListener('touchstart', handleTouch)
-    document.removeEventListener('wheel', handleWheel)
-  }
-}, [])
-```
-
-**Use passive when:** tracking/analytics, logging, any listener that doesn't call `preventDefault()`.
-
-**Don't use passive when:** implementing custom swipe gestures, custom zoom controls, or any listener that needs `preventDefault()`.
-
-### 3.3 Use SWR for Automatic Deduplication
-
-**Impact: MEDIUM-HIGH (automatic deduplication)**
-
-SWR enables request deduplication, caching, and revalidation across component instances.
-
-**Incorrect: no deduplication, each instance fetches**
-
-```tsx
-function UserList() {
-  const [users, setUsers] = useState([])
-  useEffect(() => {
-    fetch('/api/users')
-      .then(r => r.json())
-      .then(setUsers)
-  }, [])
-}
-```
-
-**Correct: multiple instances share one request**
-
-```tsx
-import useSWR from 'swr'
-
-function UserList() {
-  const { data: users } = useSWR('/api/users', fetcher)
-}
-```
-
-**For immutable data:**
-
-```tsx
-import { useImmutableSWR } from '@/lib/swr'
-
-function StaticContent() {
-  const { data } = useImmutableSWR('/api/config', fetcher)
-}
-```
-
-**For mutations:**
-
-```tsx
-import { useSWRMutation } from 'swr/mutation'
-
-function UpdateButton() {
-  const { trigger } = useSWRMutation('/api/user', updateUser)
-  return <button onClick={() => trigger()}>Update</button>
-}
-```
-
-Reference: [https://swr.vercel.app](https://swr.vercel.app)
-
-### 3.4 Version and Minimize localStorage Data
-
-**Impact: MEDIUM (prevents schema conflicts, reduces storage size)**
-
-Add version prefix to keys and store only needed fields. Prevents schema conflicts and accidental storage of sensitive data.
-
-**Incorrect:**
-
-```typescript
-// No version, stores everything, no error handling
-localStorage.setItem('userConfig', JSON.stringify(fullUserObject))
-const data = localStorage.getItem('userConfig')
-```
-
-**Correct:**
-
-```typescript
-const VERSION = 'v2'
-
-function saveConfig(config: { theme: string; language: string }) {
-  try {
-    localStorage.setItem(`userConfig:${VERSION}`, JSON.stringify(config))
-  } catch {
-    // Throws in incognito/private browsing, quota exceeded, or disabled
-  }
-}
-
-function loadConfig() {
-  try {
-    const data = localStorage.getItem(`userConfig:${VERSION}`)
-    return data ? JSON.parse(data) : null
-  } catch {
-    return null
-  }
-}
-
-// Migration from v1 to v2
-function migrate() {
-  try {
-    const v1 = localStorage.getItem('userConfig:v1')
-    if (v1) {
-      const old = JSON.parse(v1)
-      saveConfig({ theme: old.darkMode ? 'dark' : 'light', language: old.lang })
-      localStorage.removeItem('userConfig:v1')
-    }
-  } catch {}
-}
-```
-
-**Store minimal fields from server responses:**
-
-```typescript
-// User object has 20+ fields, only store what UI needs
-function cachePrefs(user: FullUser) {
-  try {
-    localStorage.setItem('prefs:v1', JSON.stringify({
-      theme: user.preferences.theme,
-      notifications: user.preferences.notifications
-    }))
-  } catch {}
-}
-```
-
-**Always wrap in try-catch:** `getItem()` and `setItem()` throw in incognito/private browsing (Safari, Firefox), when quota exceeded, or when disabled.
-
-**Benefits:** Schema evolution via versioning, reduced storage size, prevents storing tokens/PII/internal flags.
-
----
-
-## 4. Re-render Optimization
+## 2. Re-render Optimization
 
 **Impact: MEDIUM**
 
 Reducing unnecessary re-renders minimizes wasted computation and improves UI responsiveness.
 
-### 4.1 Calculate Derived State During Rendering
+### 2.1 Calculate Derived State During Rendering
 
 **Impact: MEDIUM (avoids redundant renders and state drift)**
 
@@ -816,7 +330,7 @@ function Form() {
 
 Reference: [https://react.dev/learn/you-might-not-need-an-effect](https://react.dev/learn/you-might-not-need-an-effect)
 
-### 4.2 Defer State Reads to Usage Point
+### 2.2 Defer State Reads to Usage Point
 
 **Impact: MEDIUM (avoids unnecessary subscriptions)**
 
@@ -851,7 +365,7 @@ function ShareButton({ chatId }: { chatId: string }) {
 }
 ```
 
-### 4.3 Do not wrap a simple expression with a primitive result type in useMemo
+### 2.3 Do not wrap a simple expression with a primitive result type in useMemo
 
 **Impact: LOW-MEDIUM (wasted computation on every render)**
 
@@ -883,7 +397,7 @@ function Header({ user, notifications }: Props) {
 }
 ```
 
-### 4.4 Don't Define Components Inside Components
+### 2.4 Don't Define Components Inside Components
 
 **Impact: HIGH (prevents remount on every render)**
 
@@ -963,7 +477,7 @@ function UserProfile({ user, theme }) {
 
 - Scroll position resets inside the component
 
-### 4.5 Extract Default Non-primitive Parameter Value from Memoized Component to Constant
+### 2.5 Extract Default Non-primitive Parameter Value from Memoized Component to Constant
 
 **Impact: MEDIUM (restores memoization by using a constant for default value)**
 
@@ -995,7 +509,7 @@ const UserAvatar = memo(function UserAvatar({ onClick = NOOP }: { onClick?: () =
 <UserAvatar />
 ```
 
-### 4.6 Extract to Memoized Components
+### 2.6 Extract to Memoized Components
 
 **Impact: MEDIUM (enables early returns)**
 
@@ -1035,7 +549,7 @@ function Profile({ user, loading }: Props) {
 
 **Note:** If your project has [React Compiler](https://react.dev/learn/react-compiler) enabled, manual memoization with `memo()` and `useMemo()` is not necessary. The compiler automatically optimizes re-renders.
 
-### 4.7 Narrow Effect Dependencies
+### 2.7 Narrow Effect Dependencies
 
 **Impact: LOW (minimizes effect re-runs)**
 
@@ -1076,7 +590,7 @@ useEffect(() => {
 }, [isMobile])
 ```
 
-### 4.8 Put Interaction Logic in Event Handlers
+### 2.8 Put Interaction Logic in Event Handlers
 
 **Impact: MEDIUM (avoids effect re-runs and duplicate side effects)**
 
@@ -1117,7 +631,7 @@ function Form() {
 
 Reference: [https://react.dev/learn/removing-effect-dependencies#should-this-code-move-to-an-event-handler](https://react.dev/learn/removing-effect-dependencies#should-this-code-move-to-an-event-handler)
 
-### 4.9 Split Combined Hook Computations
+### 2.9 Split Combined Hook Computations
 
 **Impact: MEDIUM (avoids recomputing independent steps)**
 
@@ -1177,7 +691,7 @@ useEffect(() => {
 
 **Note:** If your project has [React Compiler](https://react.dev/learn/react-compiler) enabled, it automatically optimizes dependency tracking and may handle some of these cases for you.
 
-### 4.10 Subscribe to Derived State
+### 2.10 Subscribe to Derived State
 
 **Impact: MEDIUM (reduces re-render frequency)**
 
@@ -1202,7 +716,7 @@ function Sidebar() {
 }
 ```
 
-### 4.11 Use Functional setState Updates
+### 2.11 Use Functional setState Updates
 
 **Impact: MEDIUM (prevents stale closures and unnecessary callback recreations)**
 
@@ -1280,7 +794,7 @@ function TodoList() {
 
 **Note:** If your project has [React Compiler](https://react.dev/learn/react-compiler) enabled, the compiler can automatically optimize some cases, but functional updates are still recommended for correctness and to prevent stale closure bugs.
 
-### 4.12 Use Lazy State Initialization
+### 2.12 Use Lazy State Initialization
 
 **Impact: MEDIUM (wasted computation on every render)**
 
@@ -1334,7 +848,7 @@ Use lazy initialization when computing initial values from localStorage/sessionS
 
 For simple primitives (`useState(0)`), direct references (`useState(props.value)`), or cheap literals (`useState({})`), the function form is unnecessary.
 
-### 4.13 Use Transitions for Non-Urgent Updates
+### 2.13 Use Transitions for Non-Urgent Updates
 
 **Impact: MEDIUM (maintains UI responsiveness)**
 
@@ -1370,7 +884,7 @@ function ScrollTracker() {
 }
 ```
 
-### 4.14 Use useDeferredValue for Expensive Derived Renders
+### 2.14 Use useDeferredValue for Expensive Derived Renders
 
 **Impact: MEDIUM (keeps input responsive during heavy computation)**
 
@@ -1427,7 +941,7 @@ function Search({ items }: { items: Item[] }) {
 
 Reference: [https://react.dev/reference/react/useDeferredValue](https://react.dev/reference/react/useDeferredValue)
 
-### 4.15 Use useRef for Transient Values
+### 2.15 Use useRef for Transient Values
 
 **Impact: MEDIUM (avoids unnecessary re-renders on frequent updates)**
 
@@ -1498,13 +1012,13 @@ function Tracker() {
 
 ---
 
-## 5. Rendering Performance
+## 3. Rendering Performance
 
 **Impact: MEDIUM**
 
 Optimizing the rendering process reduces the work the browser needs to do.
 
-### 5.1 Animate SVG Wrapper Instead of SVG Element
+### 3.1 Animate SVG Wrapper Instead of SVG Element
 
 **Impact: LOW (enables hardware acceleration)**
 
@@ -1547,7 +1061,7 @@ function LoadingSpinner() {
 
 This applies to all CSS transforms and transitions (`transform`, `opacity`, `translate`, `scale`, `rotate`). The wrapper div allows browsers to use GPU acceleration for smoother animations.
 
-### 5.2 CSS content-visibility for Long Lists
+### 3.2 CSS content-visibility for Long Lists
 
 **Impact: HIGH (faster initial render)**
 
@@ -1581,7 +1095,7 @@ function MessageList({ messages }: { messages: Message[] }) {
 
 For 1000 messages, browser skips layout/paint for ~990 off-screen items (10× faster initial render).
 
-### 5.3 Hoist Static JSX Elements
+### 3.3 Hoist Static JSX Elements
 
 **Impact: LOW (avoids re-creation)**
 
@@ -1623,7 +1137,7 @@ This is especially helpful for large and static SVG nodes, which can be expensiv
 
 **Note:** If your project has [React Compiler](https://react.dev/learn/react-compiler) enabled, the compiler automatically hoists static JSX elements and optimizes component re-renders, making manual hoisting unnecessary.
 
-### 5.4 Optimize SVG Precision
+### 3.4 Optimize SVG Precision
 
 **Impact: LOW (reduces file size)**
 
@@ -1647,7 +1161,7 @@ Reduce SVG coordinate precision to decrease file size. The optimal precision dep
 npx svgo --precision=1 --multipass icon.svg
 ```
 
-### 5.5 Use Activity Component for Show/Hide
+### 3.5 Use Activity Component for Show/Hide
 
 **Impact: MEDIUM (preserves state/DOM)**
 
@@ -1669,40 +1183,7 @@ function Dropdown({ isOpen }: Props) {
 
 Avoids expensive re-renders and state loss.
 
-### 5.6 Use defer or async on Script Tags
-
-**Impact: HIGH (eliminates render-blocking)**
-
-Script tags without `defer` or `async` block HTML parsing while the script downloads and executes. This delays First Contentful Paint and Time to Interactive.
-
-- **`defer`**: Downloads in parallel, executes after HTML parsing completes, maintains execution order
-
-- **`async`**: Downloads in parallel, executes immediately when ready, no guaranteed order
-
-Use `defer` for scripts that depend on DOM or other scripts. Use `async` for independent scripts like analytics.
-
-**Incorrect: blocks rendering**
-
-```html
-<!-- index.html -->
-<script src="https://example.com/analytics.js"></script>
-<script src="/scripts/utils.js"></script>
-```
-
-**Correct: non-blocking**
-
-```html
-<!-- Independent script - use async -->
-<script src="https://example.com/analytics.js" async></script>
-<!-- DOM-dependent script - use defer -->
-<script src="/scripts/utils.js" defer></script>
-```
-
-**Note:** In a Vite app, third-party scripts that belong in the HTML shell live in `index.html`; defer/async there is the direct fix. Scripts added dynamically from React code can use plain `document.createElement('script')` or a loader like `@vercel/analytics`. Build-time modules don't need this — bundlers already emit optimized `<script type="module">` tags.
-
-Reference: [https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script#defer](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script#defer)
-
-### 5.7 Use Explicit Conditional Rendering
+### 3.6 Use Explicit Conditional Rendering
 
 **Impact: LOW (prevents rendering 0 or NaN)**
 
@@ -1738,98 +1219,7 @@ function Badge({ count }: { count: number }) {
 // When count = 5, renders: <div><span class="badge">5</span></div>
 ```
 
-### 5.8 Use React DOM Resource Hints
-
-**Impact: HIGH (reduces load time for critical resources)**
-
-React DOM provides APIs to hint the browser about resources it will need. These are especially useful in server components to start loading resources before the client even receives the HTML.
-
-- **`prefetchDNS(href)`**: Resolve DNS for a domain you expect to connect to
-
-- **`preconnect(href)`**: Establish connection (DNS + TCP + TLS) to a server
-
-- **`preload(href, options)`**: Fetch a resource (stylesheet, font, script, image) you'll use soon
-
-- **`preloadModule(href)`**: Fetch an ES module you'll use soon
-
-- **`preinit(href, options)`**: Fetch and evaluate a stylesheet or script
-
-- **`preinitModule(href)`**: Fetch and evaluate an ES module
-
-**Example: preconnect to third-party APIs**
-
-```tsx
-import { preconnect, prefetchDNS } from 'react-dom'
-
-export default function App() {
-  prefetchDNS('https://analytics.example.com')
-  preconnect('https://api.example.com')
-
-  return <main>{/* content */}</main>
-}
-```
-
-**Example: preload critical fonts and styles**
-
-```tsx
-import { preload, preinit } from 'react-dom'
-
-export default function RootLayout({ children }) {
-  // Preload font file
-  preload('/fonts/inter.woff2', { as: 'font', type: 'font/woff2', crossOrigin: 'anonymous' })
-
-  // Fetch and apply critical stylesheet immediately
-  preinit('/styles/critical.css', { as: 'style' })
-
-  return (
-    <html>
-      <body>{children}</body>
-    </html>
-  )
-}
-```
-
-**Example: preload modules for code-split routes**
-
-```tsx
-import { preloadModule, preinitModule } from 'react-dom'
-
-function Navigation() {
-  const preloadDashboard = () => {
-    preloadModule('/dashboard.js', { as: 'script' })
-  }
-
-  return (
-    <nav>
-      <a href="/dashboard" onMouseEnter={preloadDashboard}>
-        Dashboard
-      </a>
-    </nav>
-  )
-}
-```
-
-**When to use each:**
-
-| API | Use case |
-
-|-----|----------|
-
-| `prefetchDNS` | Third-party domains you'll connect to later |
-
-| `preconnect` | APIs or CDNs you'll fetch from immediately |
-
-| `preload` | Critical resources needed for current page |
-
-| `preloadModule` | JS modules for likely next navigation |
-
-| `preinit` | Stylesheets/scripts that must execute early |
-
-| `preinitModule` | ES modules that must execute early |
-
-Reference: [https://react.dev/reference/react-dom#resource-preloading-apis](https://react.dev/reference/react-dom#resource-preloading-apis)
-
-### 5.9 Use useTransition Over Manual Loading States
+### 3.7 Use useTransition Over Manual Loading States
 
 **Impact: LOW (reduces re-renders and improves code clarity)**
 
@@ -1905,13 +1295,13 @@ Reference: [https://react.dev/reference/react/useTransition](https://react.dev/r
 
 ---
 
-## 6. JavaScript Performance
+## 4. JavaScript Performance
 
 **Impact: LOW-MEDIUM**
 
 Micro-optimizations for hot paths can add up to meaningful improvements.
 
-### 6.1 Avoid Layout Thrashing
+### 4.1 Avoid Layout Thrashing
 
 **Impact: MEDIUM (prevents forced synchronous layouts and reduces performance bottlenecks)**
 
@@ -1999,7 +1389,7 @@ Prefer CSS classes over inline styles when possible. CSS files are cached by the
 
 See [this gist](https://gist.github.com/paulirish/5d52fb081b3570c81e3a) and [CSS Triggers](https://csstriggers.com/) for more information on layout-forcing operations.
 
-### 6.2 Build Index Maps for Repeated Lookups
+### 4.2 Build Index Maps for Repeated Lookups
 
 **Impact: LOW-MEDIUM (1M ops to 2K ops)**
 
@@ -2033,7 +1423,7 @@ Build map once (O(n)), then all lookups are O(1).
 
 For 1000 orders × 1000 users: 1M ops → 2K ops.
 
-### 6.3 Cache Property Access in Loops
+### 4.3 Cache Property Access in Loops
 
 **Impact: LOW-MEDIUM (reduces lookups)**
 
@@ -2057,7 +1447,7 @@ for (let i = 0; i < len; i++) {
 }
 ```
 
-### 6.4 Cache Repeated Function Calls
+### 4.4 Cache Repeated Function Calls
 
 **Impact: MEDIUM (avoid redundant computation)**
 
@@ -2133,7 +1523,7 @@ Use a Map (not a hook) so it works everywhere: utilities, event handlers, not ju
 
 Reference: [https://vercel.com/blog/how-we-made-the-vercel-dashboard-twice-as-fast](https://vercel.com/blog/how-we-made-the-vercel-dashboard-twice-as-fast)
 
-### 6.5 Cache Storage API Calls
+### 4.5 Cache Storage API Calls
 
 **Impact: LOW-MEDIUM (reduces expensive I/O)**
 
@@ -2199,7 +1589,7 @@ document.addEventListener('visibilitychange', () => {
 
 If storage can change externally (another tab, server-set cookies), invalidate cache:
 
-### 6.6 Combine Multiple Array Iterations
+### 4.6 Combine Multiple Array Iterations
 
 **Impact: LOW-MEDIUM (reduces iterations)**
 
@@ -2227,7 +1617,7 @@ for (const user of users) {
 }
 ```
 
-### 6.7 Defer Non-Critical Work with requestIdleCallback
+### 4.7 Defer Non-Critical Work with requestIdleCallback
 
 **Impact: MEDIUM (keeps UI responsive during background tasks)**
 
@@ -2332,7 +1722,7 @@ scheduleIdleWork(() => {
 
 - Time-sensitive operations
 
-### 6.8 Early Length Check for Array Comparisons
+### 4.8 Early Length Check for Array Comparisons
 
 **Impact: MEDIUM-HIGH (avoids expensive operations when lengths differ)**
 
@@ -2381,7 +1771,7 @@ This new approach is more efficient because:
 
 - It returns early when a difference is found
 
-### 6.9 Early Return from Functions
+### 4.9 Early Return from Functions
 
 **Impact: LOW-MEDIUM (avoids unnecessary computation)**
 
@@ -2427,7 +1817,7 @@ function validateUsers(users: User[]) {
 }
 ```
 
-### 6.10 Hoist RegExp Creation
+### 4.10 Hoist RegExp Creation
 
 **Impact: LOW-MEDIUM (avoids recreation)**
 
@@ -2468,7 +1858,7 @@ regex.test('foo')  // false, lastIndex = 0
 
 Global regex (`/g`) has mutable `lastIndex` state:
 
-### 6.11 Use flatMap to Map and Filter in One Pass
+### 4.11 Use flatMap to Map and Filter in One Pass
 
 **Impact: LOW-MEDIUM (eliminates intermediate array)**
 
@@ -2525,7 +1915,7 @@ const numbers = strings.flatMap(s => {
 
 - Parsing/validating where invalid inputs should be skipped
 
-### 6.12 Use Loop for Min/Max Instead of Sort
+### 4.12 Use Loop for Min/Max Instead of Sort
 
 **Impact: LOW (O(n) instead of O(n log n))**
 
@@ -2603,7 +1993,7 @@ const max = Math.max(...numbers)
 
 This works for small arrays, but can be slower or just throw an error for very large arrays due to spread operator limitations. Maximal array length is approximately 124000 in Chrome 143 and 638000 in Safari 18; exact numbers may vary - see [the fiddle](https://jsfiddle.net/qw1jabsx/4/). Use the loop approach for reliability.
 
-### 6.13 Use Set/Map for O(1) Lookups
+### 4.13 Use Set/Map for O(1) Lookups
 
 **Impact: LOW-MEDIUM (O(n) to O(1))**
 
@@ -2623,7 +2013,7 @@ const allowedIds = new Set(['a', 'b', 'c', ...])
 items.filter(item => allowedIds.has(item.id))
 ```
 
-### 6.14 Use toSorted() Instead of sort() for Immutability
+### 4.14 Use toSorted() Instead of sort() for Immutability
 
 **Impact: MEDIUM-HIGH (prevents mutation bugs in React state)**
 
@@ -2682,13 +2072,13 @@ const sorted = [...items].sort((a, b) => a.value - b.value)
 
 ---
 
-## 7. Advanced Patterns
+## 5. Advanced Patterns
 
 **Impact: LOW**
 
 Advanced patterns for specific cases that require careful implementation.
 
-### 7.1 Do Not Put Effect Events in Dependency Arrays
+### 5.1 Do Not Put Effect Events in Dependency Arrays
 
 **Impact: LOW (avoids unnecessary effect re-runs and lint errors)**
 
@@ -2740,7 +2130,7 @@ function ChatRoom({ roomId, onConnected }: {
 
 Reference: [https://react.dev/reference/react/useEffectEvent#effect-event-in-deps](https://react.dev/reference/react/useEffectEvent#effect-event-in-deps)
 
-### 7.2 Initialize App Once, Not Per Mount
+### 5.2 Initialize App Once, Not Per Mount
 
 **Impact: LOW-MEDIUM (avoids duplicate init in development)**
 
@@ -2778,7 +2168,7 @@ function Comp() {
 
 Reference: [https://react.dev/learn/you-might-not-need-an-effect#initializing-the-application](https://react.dev/learn/you-might-not-need-an-effect#initializing-the-application)
 
-### 7.3 Store Event Handlers in Refs
+### 5.3 Store Event Handlers in Refs
 
 **Impact: LOW (stable subscriptions)**
 
@@ -2814,7 +2204,7 @@ function useWindowEvent(event: string, handler: (e) => void) {
 
 `useEffectEvent` provides a cleaner API for the same pattern: it creates a stable function reference that always calls the latest version of the handler.
 
-### 7.4 useEffectEvent for Stable Callback Refs
+### 5.4 useEffectEvent for Stable Callback Refs
 
 **Impact: LOW (prevents effect re-runs)**
 
@@ -2854,7 +2244,5 @@ function SearchInput({ onSearch }: { onSearch: (q: string) => void }) {
 ## References
 
 1. [https://react.dev](https://react.dev)
-2. [https://swr.vercel.app](https://swr.vercel.app)
-3. [https://github.com/shuding/better-all](https://github.com/shuding/better-all)
-4. [https://vercel.com/blog/how-we-optimized-package-imports-in-next-js](https://vercel.com/blog/how-we-optimized-package-imports-in-next-js)
-5. [https://vercel.com/blog/how-we-made-the-vercel-dashboard-twice-as-fast](https://vercel.com/blog/how-we-made-the-vercel-dashboard-twice-as-fast)
+2. [https://vercel.com/blog/how-we-optimized-package-imports-in-next-js](https://vercel.com/blog/how-we-optimized-package-imports-in-next-js)
+3. [https://vercel.com/blog/how-we-made-the-vercel-dashboard-twice-as-fast](https://vercel.com/blog/how-we-made-the-vercel-dashboard-twice-as-fast)

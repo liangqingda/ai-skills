@@ -35,58 +35,6 @@ app.listen(PORT, () => {
 });
 ```
 
-### Fastify - High Performance Framework
-
-**Basic Setup:**
-
-```typescript
-import Fastify from "fastify";
-import helmet from "@fastify/helmet";
-import cors from "@fastify/cors";
-import compress from "@fastify/compress";
-
-const fastify = Fastify({
-  logger: {
-    level: process.env.LOG_LEVEL || "info",
-    transport: {
-      target: "pino-pretty",
-      options: { colorize: true },
-    },
-  },
-});
-
-// Plugins
-await fastify.register(helmet);
-await fastify.register(cors, { origin: true });
-await fastify.register(compress);
-
-// Type-safe routes with schema validation
-fastify.post<{
-  Body: { name: string; email: string };
-  Reply: { id: string; name: string };
-}>(
-  "/users",
-  {
-    schema: {
-      body: {
-        type: "object",
-        required: ["name", "email"],
-        properties: {
-          name: { type: "string", minLength: 1 },
-          email: { type: "string", format: "email" },
-        },
-      },
-    },
-  },
-  async (request, reply) => {
-    const { name, email } = request.body;
-    return { id: "123", name };
-  },
-);
-
-await fastify.listen({ port: 3000, host: "0.0.0.0" });
-```
-
 ## Architectural Patterns
 
 ### Pattern 1: Layered Architecture
@@ -99,7 +47,7 @@ src/
 ├── services/        # Business logic
 ├── repositories/    # Data access layer
 ├── models/          # Data models
-├── middleware/      # Express/Fastify middleware
+├── middleware/      # Express middleware
 ├── routes/          # Route definitions
 ├── utils/           # Helper functions
 ├── config/          # Configuration
@@ -583,7 +531,6 @@ Node.js supports both SQL and NoSQL databases. Use connection pooling for all pr
 
 Key patterns covered in [references/advanced-patterns.md](./advanced-patterns.md):
 - **PostgreSQL with connection pool** — `pg` Pool configuration and graceful shutdown
-- **MongoDB with Mongoose** — connection management and schema definition
 - **Transaction pattern** — `BEGIN`/`COMMIT`/`ROLLBACK` with `pg` client
 
 ## Authentication & Authorization
